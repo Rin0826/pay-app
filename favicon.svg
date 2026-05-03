@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 背景の角丸四角形（テーマカラーの青） -->
+  <rect width="100" height="100" rx="20" fill="#007bff"/>
+  <!-- カードのICチップをイメージした黄色い四角 -->
+  <rect x="20" y="25" width="20" height="15" rx="3" fill="#f1c40f"/>
+  <!-- ¥マーク -->
+  <text x="50" y="75" font-family="Arial, sans-serif" font-weight="bold" font-size="50" fill="#ffffff" text-anchor="middle">¥</text>
+</svg>
