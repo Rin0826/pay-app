@@ -1,18 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ページ上部に今日の日付を表示
     displayCurrentDate();
-
-    // 前回保存した入力ログを復元
+    updateConfirmationStatus(); // 確定・未確定の判定を実行
     loadLog();
 
-    // 「計算・保存する」ボタンが押された時の処理
     document.getElementById('calc-button').addEventListener('click', calculateAndSave);
-    
-    // 初回表示時にも一度計算を走らせておく
     calculateAndSave();
 });
 
-// 日付を取得して表示する関数
 function displayCurrentDate() {
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const now = new Date();
@@ -24,28 +18,52 @@ function displayCurrentDate() {
     document.getElementById('current-date').textContent = `${year}年${month}月${date}日 (${day})`;
 }
 
-// 入力欄から数値を取得する関数（未入力は0として扱う）
+// 今日の日付を元に確定・未確定を判定する関数
+function updateConfirmationStatus() {
+    const today = new Date().getDate(); // 今日の日付 (1〜31)
+    
+    // 各カードの確定日を設定
+    const confirmDates = {
+        'status-mercard': 1,   // メルカード (1日)
+        'status-olive': 10,    // Olive (10日)
+        'status-paypay': 12,   // PayPay (12日)
+        'status-kabuand': 25,  // カブアンド (25日)
+        'status-eneos': 26     // エネオス (26日)
+    };
+
+    for (const [id, confirmDate] of Object.entries(confirmDates)) {
+        const el = document.getElementById(id);
+        // 今日の日付が確定日以降であれば「確定(緑)」、そうでなければ「未確定(黄)」
+        if (today >= confirmDate) {
+            el.textContent = '確定';
+            el.className = 'badge confirmed';
+        } else {
+            el.textContent = '未確定';
+            el.className = 'badge unconfirmed';
+        }
+    }
+}
+
 function getVal(id) {
     const val = document.getElementById(id).value;
     return val ? parseInt(val, 10) : 0;
 }
 
-// メインの計算処理と保存
 function calculateAndSave() {
-    // --- 1. 月の支払額の取得と合計 ---
-    const pOlive = getVal('pay-olive');     // 26日
-    const pPaypay = getVal('pay-paypay');   // 27日
-    const pMercard = getVal('pay-mercard'); // 今月末
-    const pKabuand = getVal('pay-kabuand'); // 翌月10日
-    const pEneos = getVal('pay-eneos');     // 翌月2日
-    const pPaidy = 4656;                    // 27日 (固定)
-    const pIpad = 6566;                     // 27日 (固定)
-    const pOther = getVal('pay-other');     // その他
+    // --- 1. 月の支払額の取得 ---
+    const pOlive = getVal('pay-olive');     
+    const pPaypay = getVal('pay-paypay');   
+    const pMercard = getVal('pay-mercard'); 
+    const pKabuand = getVal('pay-kabuand'); 
+    const pEneos = getVal('pay-eneos');     
+    const pPaidy = 4656;                    
+    const pIpad = 6566;                     
+    const pOther = getVal('pay-other');     
 
     const totalPayment = pOlive + pPaypay + pMercard + pKabuand + pEneos + pPaidy + pIpad + pOther;
     document.getElementById('total-payment').textContent = totalPayment.toLocaleString();
 
-    // --- 2. 所持金合計額の取得と合計 ---
+    // --- 2. 所持金合計額の取得 ---
     const mUfj = getVal('money-ufj');
     const mSmbc = getVal('money-smbc');
     const mChiba = getVal('money-chiba');
@@ -59,7 +77,6 @@ function calculateAndSave() {
     const diff = totalMoney - totalPayment;
     const overallEl = document.getElementById('overall-shortage');
     
-    // 全体での不足判定
     if (diff < 0) {
         overallEl.textContent = `全体で ${Math.abs(diff).toLocaleString()}円 足りてません`;
         overallEl.className = 'overall-result shortage';
@@ -68,34 +85,30 @@ function calculateAndSave() {
         overallEl.className = 'overall-result surplus';
     }
 
-    // 日付順に所持金から引いていくシミュレーション
-    // ※「その他」の支払いは日付指定がないため、安全のために最初から引いた状態で計算します
     let currentBalance = totalMoney - pOther; 
     
-    // 支払いの順番リスト
+    // スケジュールごとの残高計算（カード名の横に日付を出さないよう調整）
     const schedules = [
-        { name: "26日 (Olive)", amount: pOlive },
-        { name: "27日 (PayPay, Paidy, iPad)", amount: pPaypay + pPaidy + pIpad },
-        { name: "今月末 (メルカード)", amount: pMercard },
-        { name: "翌月2日 (エネオス)", amount: pEneos },
-        { name: "翌月10日 (カブアンド)", amount: pKabuand }
+        { label: "26日時点 (Olive引落とし後)", amount: pOlive },
+        { label: "27日時点 (PayPay・Paidy・iPad引落とし後)", amount: pPaypay + pPaidy + pIpad },
+        { label: "今月末時点 (メルカード引落とし後)", amount: pMercard },
+        { label: "翌月2日時点 (エネオス引落とし後)", amount: pEneos },
+        { label: "翌月10日時点 (カブアンド引落とし後)", amount: pKabuand }
     ];
 
     const listEl = document.getElementById('schedule-list');
-    listEl.innerHTML = ''; // リストを一度リセット
+    listEl.innerHTML = ''; 
 
-    // 各支払日のタイミングで残高を計算し、画面に追加
     schedules.forEach(schedule => {
         currentBalance -= schedule.amount;
         
         const li = document.createElement('li');
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = `${schedule.name} 引落とし後`;
+        nameSpan.textContent = schedule.label;
         
         const amountSpan = document.createElement('span');
         amountSpan.className = 'amount';
         
-        // その時点でマイナスに転じていれば赤字で「足りてません」と表示
         if (currentBalance < 0) {
             li.className = 'warning';
             amountSpan.textContent = `${Math.abs(currentBalance).toLocaleString()}円 足りてません`;
@@ -112,7 +125,6 @@ function calculateAndSave() {
     saveLog();
 }
 
-// localStorageに入力内容を保存
 function saveLog() {
     const data = {
         pOlive: document.getElementById('pay-olive').value,
@@ -130,7 +142,6 @@ function saveLog() {
     localStorage.setItem('paymentAppData', JSON.stringify(data));
 }
 
-// localStorageから入力内容を復元
 function loadLog() {
     const savedData = localStorage.getItem('paymentAppData');
     if (savedData) {
