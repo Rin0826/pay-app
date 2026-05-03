@@ -71,6 +71,8 @@ h3 {
 .input-group label {
     flex: 1;
     font-size: 0.95em;
+    display: flex;
+    align-items: center;
 }
 
 .input-group input {
@@ -157,4 +159,23 @@ button:hover {
 /* マイナスになったときの赤字スタイル */
 .schedule-list li.warning span.amount {
     color: var(--danger-color);
+}
+
+/* --- 確定・未確定バッジのスタイル --- */
+.badge {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.badge.confirmed {
+    background-color: #2ecc71; /* 緑 */
+    color: white;
+}
+
+.badge.unconfirmed {
+    background-color: #f1c40f; /* 黄色 */
+    color: #333;
 }
