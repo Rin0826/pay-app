@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支払管理アプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ページトップに日付を表示 -->
+        <div id="current-date" class="date-display"></div>
+
+        <h1>支払管理アプリ</h1>
+
+        <div class="sections">
+            <!-- 支払額入力エリア -->
+            <section class="card">
+                <h2>月の支払額</h2>
+                <div class="input-group">
+                    <label>① Olive (26日)</label>
+                    <input type="number" id="pay-olive" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>② PayPay (27日)</label>
+                    <input type="number" id="pay-paypay" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>③ メルカード (今月末)</label>
+                    <input type="number" id="pay-mercard" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>④ カブアンド (翌月10日)</label>
+                    <input type="number" id="pay-kabuand" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>⑤ エネオス (翌月2日)</label>
+                    <input type="number" id="pay-eneos" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>⑥ Paidy (27日) [固定]</label>
+                    <input type="number" id="pay-paidy" value="4656" readonly> 円
+                </div>
+                <div class="input-group">
+                    <label>⑦ iPad (27日) [固定]</label>
+                    <input type="number" id="pay-ipad" value="6566" readonly> 円
+                </div>
+                <div class="input-group">
+                    <label>⑧ その他</label>
+                    <input type="number" id="pay-other" placeholder="0"> 円
+                </div>
+                <div class="total-display">
+                    合計支払額: <span id="total-payment">0</span> 円
+                </div>
+            </section>
+
+            <!-- 所持金入力エリア -->
+            <section class="card">
+                <h2>所持金合計額</h2>
+                <div class="input-group">
+                    <label>① 三菱UFJ銀行</label>
+                    <input type="number" id="money-ufj" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>② 三井住友銀行</label>
+                    <input type="number" id="money-smbc" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>③ 千葉銀行</label>
+                    <input type="number" id="money-chiba" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>④ 手持ち</label>
+                    <input type="number" id="money-cash" placeholder="0"> 円
+                </div>
+                <div class="input-group">
+                    <label>⑤ その他</label>
+                    <input type="number" id="money-other" placeholder="0"> 円
+                </div>
+                <div class="total-display">
+                    所持金合計額: <span id="total-money">0</span> 円
+                </div>
+            </section>
+        </div>
+
+        <!-- 計算実行ボタン -->
+        <button id="calc-button">計算・保存する</button>
+
+        <!-- 結果表示エリア -->
+        <section class="card result-section">
+            <h2>現在不足分の計算</h2>
+            <!-- 全体の不足分/余裕額 -->
+            <div id="overall-shortage" class="overall-result"></div>
+            
+            <!-- 日程ごとのシミュレーション -->
+            <h3>支払いスケジュールごとの残高推移</h3>
+            <ul id="schedule-list" class="schedule-list">
+                <!-- ここにJavaScriptでリストが生成されます -->
+            </ul>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
