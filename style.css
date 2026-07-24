@@ -84,12 +84,6 @@ h3 {
     font-size: 1em;
 }
 
-.input-group input[readonly] {
-    background-color: #eee;
-    color: #666;
-    border: 1px solid #ccc;
-}
-
 .total-display {
     margin-top: 15px;
     padding-top: 10px;
@@ -159,23 +153,4 @@ button:hover {
 /* マイナスになったときの赤字スタイル */
 .schedule-list li.warning span.amount {
     color: var(--danger-color);
-}
-
-/* --- 確定・未確定バッジのスタイル --- */
-.badge {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    border-radius: 12px;
-    margin-left: 10px;
-    font-weight: bold;
-}
-
-.badge.confirmed {
-    background-color: #2ecc71; /* 緑 */
-    color: white;
-}
-
-.badge.unconfirmed {
-    background-color: #f1c40f; /* 黄色 */
-    color: #333;
 }
