@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     displayCurrentDate();
-    updateConfirmationStatus(); // 確定・未確定の判定を実行
     loadLog();
 
     document.getElementById('calc-button').addEventListener('click', calculateAndSave);
@@ -18,32 +17,6 @@ function displayCurrentDate() {
     document.getElementById('current-date').textContent = `${year}年${month}月${date}日 (${day})`;
 }
 
-// 今日の日付を元に確定・未確定を判定する関数
-function updateConfirmationStatus() {
-    const today = new Date().getDate(); // 今日の日付 (1〜31)
-    
-    // 各カードの確定日を設定
-    const confirmDates = {
-        'status-mercard': 1,   // メルカード (1日)
-        'status-olive': 10,    // Olive (10日)
-        'status-paypay': 12,   // PayPay (12日)
-        'status-kabuand': 25,  // カブアンド (25日)
-        'status-eneos': 26     // エネオス (26日)
-    };
-
-    for (const [id, confirmDate] of Object.entries(confirmDates)) {
-        const el = document.getElementById(id);
-        // 今日の日付が確定日以降であれば「確定(緑)」、そうでなければ「未確定(黄)」
-        if (today >= confirmDate) {
-            el.textContent = '確定';
-            el.className = 'badge confirmed';
-        } else {
-            el.textContent = '未確定';
-            el.className = 'badge unconfirmed';
-        }
-    }
-}
-
 function getVal(id) {
     const val = document.getElementById(id).value;
     return val ? parseInt(val, 10) : 0;
@@ -56,11 +29,12 @@ function calculateAndSave() {
     const pMercard = getVal('pay-mercard'); 
     const pKabuand = getVal('pay-kabuand'); 
     const pEneos = getVal('pay-eneos');     
-    const pPaidy = 4656;                    
-    const pIpad = 6566;                     
+    const pPaidy = getVal('pay-paidy');                    
+    const pIpad = getVal('pay-ipad');
+    const pAmazon = getVal('pay-amazon');
     const pOther = getVal('pay-other');     
 
-    const totalPayment = pOlive + pPaypay + pMercard + pKabuand + pEneos + pPaidy + pIpad + pOther;
+    const totalPayment = pOlive + pPaypay + pMercard + pKabuand + pEneos + pPaidy + pIpad + pAmazon + pOther;
     document.getElementById('total-payment').textContent = totalPayment.toLocaleString();
 
     // --- 2. 所持金合計額の取得 ---
@@ -85,9 +59,9 @@ function calculateAndSave() {
         overallEl.className = 'overall-result surplus';
     }
 
-    let currentBalance = totalMoney - pOther; 
+    // Amazonカードとその他は残高シミュレーション上、初期の所持金から先に差し引いておく
+    let currentBalance = totalMoney - pOther - pAmazon; 
     
-    // スケジュールごとの残高計算（カード名の横に日付を出さないよう調整）
     const schedules = [
         { label: "26日時点 (Olive引落とし後)", amount: pOlive },
         { label: "27日時点 (PayPay・Paidy・iPad引落とし後)", amount: pPaypay + pPaidy + pIpad },
@@ -132,6 +106,9 @@ function saveLog() {
         pMercard: document.getElementById('pay-mercard').value,
         pKabuand: document.getElementById('pay-kabuand').value,
         pEneos: document.getElementById('pay-eneos').value,
+        pPaidy: document.getElementById('pay-paidy').value,
+        pIpad: document.getElementById('pay-ipad').value,
+        pAmazon: document.getElementById('pay-amazon').value,
         pOther: document.getElementById('pay-other').value,
         mUfj: document.getElementById('money-ufj').value,
         mSmbc: document.getElementById('money-smbc').value,
@@ -151,6 +128,9 @@ function loadLog() {
         if(data.pMercard) document.getElementById('pay-mercard').value = data.pMercard;
         if(data.pKabuand) document.getElementById('pay-kabuand').value = data.pKabuand;
         if(data.pEneos) document.getElementById('pay-eneos').value = data.pEneos;
+        if(data.pPaidy) document.getElementById('pay-paidy').value = data.pPaidy;
+        if(data.pIpad) document.getElementById('pay-ipad').value = data.pIpad;
+        if(data.pAmazon) document.getElementById('pay-amazon').value = data.pAmazon;
         if(data.pOther) document.getElementById('pay-other').value = data.pOther;
         if(data.mUfj) document.getElementById('money-ufj').value = data.mUfj;
         if(data.mSmbc) document.getElementById('money-smbc').value = data.mSmbc;
